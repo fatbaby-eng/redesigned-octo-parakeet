@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas — Todd Boswell</title>
+    <link rel="icon" href="/atlas/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/atlas/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">▲</span>
+        <span class="title">Atlas</span>
+      </div>
+      <div class="filters">
+        <select id="filter-area">
+          <option value="">All areas</option>
+          <option value="work">Work</option>
+          <option value="freelance">Freelance</option>
+          <option value="personal">Personal</option>
+        </select>
+        <select id="filter-status">
+          <option value="">All statuses</option>
+          <option value="idea">Idea</option>
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="done">Done</option>
+          <option value="archived">Archived</option>
+        </select>
+        <input id="filter-search" type="search" placeholder="Search title, tag, stack..." />
+        <button id="btn-new" class="primary">+ New</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <ul id="project-list" class="project-list" aria-label="Projects"></ul>
+      </aside>
+
+      <section class="detail" id="detail">
+        <div class="empty-state" id="empty-state">
+          <h2>Select a project</h2>
+          <p>Pick one from the list, or create a new one.</p>
+        </div>
+      </section>
+    </main>
+
+    <template id="project-card-tpl">
+      <li class="project-card">
+        <button class="card-button">
+          <div class="row">
+            <span class="pin" aria-hidden="true"></span>
+            <span class="card-title"></span>
+          </div>
+          <div class="row meta">
+            <span class="badge area"></span>
+            <span class="badge status"></span>
+            <span class="updated"></span>
+          </div>
+          <div class="row tags"></div>
+        </button>
+      </li>
+    </template>
+
+    <template id="detail-tpl">
+      <article class="project-detail">
+        <header class="detail-header">
+          <input class="title-input" data-field="title" />
+          <div class="actions">
+            <button class="btn-pin" title="Pin">★</button>
+            <button class="btn-delete" title="Delete">Delete</button>
+          </div>
+        </header>
+
+        <div class="detail-grid">
+          <label>Area
+            <select data-field="area">
+              <option value="work">Work</option>
+              <option value="freelance">Freelance</option>
+              <option value="personal">Personal</option>
+            </select>
+          </label>
+          <label>Status
+            <select data-field="status">
+              <option value="idea">Idea</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="done">Done</option>
+              <option value="archived">Archived</option>
+            </select>
+          </label>
+          <label>Next action
+            <input data-field="nextAction" />
+          </label>
+          <label>Live URL
+            <input data-field="liveUrl" />
+          </label>
+          <label>Primary path
+            <input data-field="primaryPath" />
+          </label>
+          <label>Thumbnail URL
+            <input data-field="thumbnail" />
+          </label>
+          <label>Stack (comma separated)
+            <input data-field="stack" />
+          </label>
+          <label>Tags (comma separated)
+            <input data-field="tags" />
+          </label>
+        </div>
+
+        <label class="full">Notes
+          <textarea data-field="notes" rows="4"></textarea>
+        </label>
+        <label class="full">Dossier (how it was built)
+          <textarea data-field="dossier" rows="6"></textarea>
+        </label>
+
+        <div class="save-row">
+          <button class="btn-save primary">Save</button>
+          <span class="save-status" aria-live="polite"></span>
+        </div>
+
+        <section class="panel">
+          <h3>Log</h3>
+          <div class="log-input">
+            <input class="log-text" placeholder="What did you just do on this project?" />
+            <button class="btn-log primary">Add</button>
+          </div>
+          <ul class="log-list"></ul>
+        </section>
+
+        <section class="panel">
+          <h3>Reflect with Claude</h3>
+          <div class="reflect-input">
+            <textarea class="reflect-question" rows="2"
+              placeholder="Ask a question about this project..."></textarea>
+            <button class="btn-reflect primary">Ask</button>
+          </div>
+          <div class="reflect-answer"></div>
+          <ul class="reflect-history"></ul>
+        </section>
+      </article>
+    </template>
+
+    <script src="/atlas/app.js" type="module"></script>
+  </body>
+</html>

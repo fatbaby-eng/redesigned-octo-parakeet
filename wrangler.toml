@@ -1,0 +1,12 @@
+name = "tb-atlas"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tb-atlas"
+database_id = "19ef0420-72ea-4a51-986b-a749512ffc7e"
