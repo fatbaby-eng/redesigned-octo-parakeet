@@ -9,7 +9,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Atlas — Todd's project map</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <!-- Agent strip acting as a toast popup -->
@@ -36,6 +36,7 @@
           <span class="conn-dot"></span>
           <span class="conn-label">cloud</span>
         </div>
+        <button type="button" class="btn btn-ghost" id="btn-reset-cache" title="Clear local cache and reload from server">Reset</button>
         <button type="button" class="btn btn-primary" id="btn-new">+ Project</button>
         <button type="button" class="btn" id="btn-export" title="Export JSON backup">Export</button>
         <button type="button" class="btn" id="btn-import" title="Import JSON backup">Import</button>
@@ -301,6 +302,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

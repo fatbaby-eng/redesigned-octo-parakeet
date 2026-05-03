@@ -2095,6 +2095,18 @@
   function wire() {
     // Top toolbar
     document.getElementById("btn-new").addEventListener("click", openNewModal);
+    document.getElementById("btn-reset-cache").addEventListener("click", function () {
+      if (!confirm("Reset local cache?\n\nThis clears the browser's local copy of your projects and reloads from the server. Server data is not touched.")) return;
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        // also clear sessionStorage just in case
+        try { sessionStorage.clear(); } catch (e) {}
+      } catch (e) {}
+      // Bust the parent HTML cache so a stale index.html can't redirect us back
+      var url = new URL(window.location.href);
+      url.searchParams.set("nocache", Date.now().toString(36));
+      window.location.replace(url.toString());
+    });
     document.getElementById("btn-export").addEventListener("click", exportJson);
     document.getElementById("btn-import").addEventListener("click", function () {
       document.getElementById("import-file").click();
