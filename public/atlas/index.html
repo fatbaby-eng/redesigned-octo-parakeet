@@ -1,149 +1,285 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Atlas — Todd Boswell</title>
-    <link rel="icon" href="/atlas/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/atlas/styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="brand">
-        <span class="logo">▲</span>
-        <span class="title">Atlas</span>
-      </div>
-      <div class="filters">
-        <select id="filter-area">
-          <option value="">All areas</option>
-          <option value="work">Work</option>
-          <option value="freelance">Freelance</option>
-          <option value="personal">Personal</option>
-        </select>
-        <select id="filter-status">
-          <option value="">All statuses</option>
-          <option value="idea">Idea</option>
-          <option value="active">Active</option>
-          <option value="paused">Paused</option>
-          <option value="done">Done</option>
-          <option value="archived">Archived</option>
-        </select>
-        <input id="filter-search" type="search" placeholder="Search title, tag, stack..." />
-        <button id="btn-new" class="primary">+ New</button>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0d0d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Atlas — Todd's project map</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Agent strip acting as a toast popup -->
+  <div class="agent-strip toast-mode" id="agent-strip" hidden>
+    <div class="agent-loader" id="agent-loader" hidden>Thinking...</div>
+    <div class="agent-msg" id="agent-msg"></div>
+    <div class="agent-actions" id="agent-actions" hidden>
+      <button type="button" class="btn btn-primary" id="btn-agent-confirm">Apply changes</button>
+    </div>
+    <button type="button" class="agent-close" id="btn-agent-close" aria-label="Close">×</button>
+  </div>
 
-    <main class="layout">
-      <aside class="sidebar">
-        <ul id="project-list" class="project-list" aria-label="Projects"></ul>
-      </aside>
+  <header class="app-header">
+    <div class="header-top">
+      <h1 class="cool-title">Atlas</h1>
+      
+      <div class="search-wrap main-search">
+        <label class="sr-only" for="search">Ask Atlas or search</label>
+        <input type="search" id="search" placeholder="Ask Atlas or search…" autocomplete="off">
+      </div>
 
-      <section class="detail" id="detail">
-        <div class="empty-state" id="empty-state">
-          <h2>Select a project</h2>
-          <p>Pick one from the list, or create a new one.</p>
+      <div class="header-actions">
+        <div class="conn-status" id="conn-status" aria-live="polite" title="Connection status">
+          <span class="conn-dot"></span>
+          <span class="conn-label">cloud</span>
         </div>
+        <button type="button" class="btn btn-primary" id="btn-new">+ Project</button>
+        <button type="button" class="btn" id="btn-export" title="Export JSON backup">Export</button>
+        <button type="button" class="btn" id="btn-import" title="Import JSON backup">Import</button>
+        <input type="file" id="import-file" class="import-hidden" accept="application/json,.json">
+      </div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="view-tabs" role="group" aria-label="View">
+        <button type="button" data-view="cards" aria-pressed="true">Cards</button>
+        <button type="button" data-view="dashboard" aria-pressed="false">Dashboard</button>
+        <button type="button" data-view="tech" aria-pressed="false">Tech map</button>
+        <button type="button" data-view="timeline" aria-pressed="false">Timeline</button>
+      </div>
+      <div class="area-tabs" role="group" aria-label="Filter by area">
+        <button type="button" data-area="all" aria-pressed="true">All</button>
+        <button type="button" data-area="work" aria-pressed="false">Work</button>
+        <button type="button" data-area="freelance" aria-pressed="false">Freelance</button>
+        <button type="button" data-area="personal" aria-pressed="false">Personal</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Cards view -->
+    <section id="view-cards" class="view" aria-label="Projects">
+      <section class="focus-strip" id="focus-strip" hidden>
+        <h2>Now</h2>
+        <div class="focus-cards" id="focus-cards"></div>
       </section>
-    </main>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
 
-    <template id="project-card-tpl">
-      <li class="project-card">
-        <button class="card-button">
-          <div class="row">
-            <span class="pin" aria-hidden="true"></span>
-            <span class="card-title"></span>
+    <!-- Dashboard view -->
+    <section id="view-dashboard" class="view" aria-label="Dashboard" hidden>
+      <div class="bento-grid">
+        <!-- The "Now" Widget (Large) -->
+        <div class="bento-box bento-large glass-panel" id="bento-now">
+          <div class="bento-now-content">
+            <h3 class="bento-title">NOW IN FOCUS</h3>
+            <div id="bento-now-body"></div>
           </div>
-          <div class="row meta">
-            <span class="badge area"></span>
-            <span class="badge status"></span>
-            <span class="updated"></span>
-          </div>
-          <div class="row tags"></div>
-        </button>
-      </li>
-    </template>
-
-    <template id="detail-tpl">
-      <article class="project-detail">
-        <header class="detail-header">
-          <input class="title-input" data-field="title" />
-          <div class="actions">
-            <button class="btn-pin" title="Pin">★</button>
-            <button class="btn-delete" title="Delete">Delete</button>
-          </div>
-        </header>
-
-        <div class="detail-grid">
-          <label>Area
-            <select data-field="area">
-              <option value="work">Work</option>
-              <option value="freelance">Freelance</option>
-              <option value="personal">Personal</option>
-            </select>
-          </label>
-          <label>Status
-            <select data-field="status">
-              <option value="idea">Idea</option>
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="done">Done</option>
-              <option value="archived">Archived</option>
-            </select>
-          </label>
-          <label>Next action
-            <input data-field="nextAction" />
-          </label>
-          <label>Live URL
-            <input data-field="liveUrl" />
-          </label>
-          <label>Primary path
-            <input data-field="primaryPath" />
-          </label>
-          <label>Thumbnail URL
-            <input data-field="thumbnail" />
-          </label>
-          <label>Stack (comma separated)
-            <input data-field="stack" />
-          </label>
-          <label>Tags (comma separated)
-            <input data-field="tags" />
-          </label>
         </div>
 
-        <label class="full">Notes
-          <textarea data-field="notes" rows="4"></textarea>
-        </label>
-        <label class="full">Dossier (how it was built)
-          <textarea data-field="dossier" rows="6"></textarea>
-        </label>
-
-        <div class="save-row">
-          <button class="btn-save primary">Save</button>
-          <span class="save-status" aria-live="polite"></span>
+        <!-- The "Status Rings" Widget (Small) -->
+        <div class="bento-box bento-small glass-panel center-content" id="bento-rings">
+          <h3 class="bento-title">PROJECT METRICS</h3>
+          <svg id="rings-svg" viewBox="0 0 120 120" class="rings-chart"></svg>
+          <div id="rings-legend" class="rings-legend"></div>
         </div>
 
-        <section class="panel">
-          <h3>Log</h3>
-          <div class="log-input">
-            <input class="log-text" placeholder="What did you just do on this project?" />
-            <button class="btn-log primary">Add</button>
-          </div>
-          <ul class="log-list"></ul>
-        </section>
+        <!-- The "Tech Map" Widget (Wide) -->
+        <div class="bento-box bento-wide glass-panel" id="bento-tech">
+          <h3 class="bento-title">TECH HEARTBEAT</h3>
+          <div class="marquee-content" id="bento-tech-list"></div>
+        </div>
 
-        <section class="panel">
-          <h3>Reflect with Claude</h3>
-          <div class="reflect-input">
-            <textarea class="reflect-question" rows="2"
-              placeholder="Ask a question about this project..."></textarea>
-            <button class="btn-reflect primary">Ask</button>
+        <!-- Global Heatmap Widget (Full) -->
+        <div class="bento-box bento-full glass-panel" id="bento-heatmap">
+          <h3 class="bento-title">GLOBAL ACTIVITY HEATMAP</h3>
+          <div class="heatmap-wrapper">
+            <svg id="heatmap-svg" class="heatmap-chart"></svg>
           </div>
-          <div class="reflect-answer"></div>
-          <ul class="reflect-history"></ul>
-        </section>
-      </article>
-    </template>
+        </div>
 
-    <script src="/atlas/app.js" type="module"></script>
-  </body>
+        <!-- Project Spread Map Widget (Full) -->
+        <div class="bento-box bento-full glass-panel" id="bento-spread">
+          <h3 class="bento-title">PROJECT SPREAD</h3>
+          <div class="forecast-frame" id="forecast-frame" style="border:none; background:transparent;">
+            <svg id="forecast-svg" xmlns="http://www.w3.org/2000/svg" aria-label="Workload forecast chart"></svg>
+            <div class="forecast-tooltip" id="forecast-tooltip" hidden></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech map view -->
+    <section id="view-tech" class="view" aria-label="Tech map" hidden>
+      <div id="tech-groups"></div>
+    </section>
+
+    <!-- Timeline view -->
+    <section id="view-timeline" class="view" aria-label="Timeline" hidden>
+      <div id="timeline-list"></div>
+    </section>
+  </main>
+
+  <!-- Dossier modal -->
+  <!-- Dossier stats modal -->
+  <dialog class="modal stats-modal" id="project-modal" aria-labelledby="modal-title">
+    <div class="modal-inner">
+      <button type="button" class="btn-close-icon" id="btn-close-modal" aria-label="Close">×</button>
+      
+      <div class="modal-banner" id="modal-banner"></div>
+      
+      <div class="modal-stats-header">
+        <div class="avatar-edit-wrapper">
+          <div class="modal-avatar" id="modal-avatar"></div>
+          <div class="avatar-overlay" onclick="document.getElementById('f-thumb-file').click()">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <span>Edit</span>
+          </div>
+          <input type="file" id="f-thumb-file" accept="image/*" style="display: none;" onchange="handleThumbUpload(event)">
+          <input type="hidden" id="f-thumbnail">
+        </div>
+        <div class="modal-title-group">
+          <input type="text" id="f-title" class="stats-title-input" autocomplete="off" placeholder="Project Title">
+          <div class="modal-sub mono" id="modal-sub"></div>
+        </div>
+      </div>
+
+      <div class="modal-body stats-grid">
+        <!-- Main Column (Quest, Lore, Architecture, Reflection at bottom) -->
+        <div class="stats-main">
+          <div class="stats-section">
+            <h3 class="stats-section-title">ACTIVE QUEST</h3>
+            <label class="field">
+              <input type="text" id="f-next" class="quest-input" placeholder="The one concrete step to take next" autocomplete="off">
+            </label>
+          </div>
+
+          <div class="stats-section">
+            <h3 class="stats-section-title">OVERVIEW / LORE</h3>
+            <label class="field">
+              <textarea id="f-notes" class="lore-textarea" placeholder="What this is, in a sentence or two..."></textarea>
+            </label>
+          </div>
+
+          <div class="stats-section">
+            <h3 class="stats-section-title">ARCHITECTURE &amp; ORIGIN</h3>
+            <label class="field">
+              <textarea id="f-dossier" rows="6" placeholder="Architecture sketch, key decisions, notable files..."></textarea>
+            </label>
+          </div>
+
+          <div class="stats-section reflect-section">
+            <h3 class="stats-section-title">REFLECTION (Ask Claude)</h3>
+            <div class="reflect-head">
+              <div class="reflect-presets">
+                <button type="button" class="btn btn-ghost reflect-preset" data-q="Revive or archive?">Revive?</button>
+                <button type="button" class="btn btn-ghost reflect-preset" data-q="What's the unfinished thought here?">Unfinished?</button>
+                <button type="button" class="btn btn-ghost reflect-preset" data-q="Audit for gaps, risks, or obvious improvements.">Audit gaps</button>
+              </div>
+            </div>
+            <label class="field">
+              <textarea id="reflect-question" rows="2" placeholder="Ask Claude..."></textarea>
+            </label>
+            <div class="reflect-actions">
+              <button type="button" class="btn btn-primary" id="btn-reflect">Ask Claude</button>
+              <span class="reflect-status mono" id="reflect-status"></span>
+            </div>
+            <div class="reflect-answer" id="reflect-answer" hidden></div>
+            <div class="reflect-history" id="reflect-history"></div>
+          </div>
+        </div>
+
+        <!-- Sidebar (Status, Inventory, Activity Log, Actions) -->
+        <div class="stats-side">
+          <div class="stats-section">
+            <h3 class="stats-section-title">STATUS</h3>
+            <div class="field-row">
+              <label class="field">
+                <select id="f-status" class="stats-select">
+                  <option value="idea">Idea</option>
+                  <option value="active" selected>Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="done">Done</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </label>
+              <label class="field">
+                <select id="f-area" class="stats-select">
+                  <option value="work">Work</option>
+                  <option value="freelance">Freelance</option>
+                  <option value="personal" selected>Personal</option>
+                </select>
+              </label>
+            </div>
+            <label class="field field-check">
+              <input type="checkbox" id="f-pinned">
+              <span>Pin to Now</span>
+            </label>
+          </div>
+
+          <div class="stats-section">
+            <h3 class="stats-section-title">INVENTORY</h3>
+            <label class="field">
+              <span>Tools / Stack</span>
+              <input type="text" id="f-stack" placeholder="e.g. vanilla-js, d1">
+            </label>
+            <label class="field">
+              <span>Tags</span>
+              <input type="text" id="f-tags" placeholder="e.g. urgent">
+            </label>
+            <label class="field">
+              <span>Primary Path</span>
+              <div class="path-row">
+                <input type="text" id="f-primary-path" placeholder="e.g. code/atlas">
+                <button type="button" class="btn btn-ghost" id="btn-copy-primary">Copy</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>Live URL</span>
+              <div class="path-row">
+                <input type="url" id="f-live-url" placeholder="https://…">
+                <a href="#" target="_blank" class="btn btn-ghost" id="btn-open-live-url" title="Open Link" style="display:flex;align-items:center;padding:0 0.5rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+              </div>
+            </label>
+            <div class="field">
+              <span class="field-label">Docs</span>
+              <div id="paths-editor" class="list-editor"></div>
+            </div>
+            <div class="field">
+              <span class="field-label">Links</span>
+              <div id="links-editor" class="list-editor"></div>
+            </div>
+            <div class="field">
+              <span class="field-label">Related</span>
+              <div id="related-editor" class="chips-editor"></div>
+            </div>
+          </div>
+
+          <div class="stats-section activity-log-section">
+            <h3 class="stats-section-title">ACTIVITY LOG</h3>
+            <div class="quick-log">
+              <label class="sr-only" for="quick-log-input">Add log entry</label>
+              <input type="text" id="quick-log-input" placeholder="Quick note with timestamp…" autocomplete="off">
+              <button type="button" class="btn" id="btn-quick-log">Add</button>
+            </div>
+            <div id="log-list" class="log-list"></div>
+          </div>
+
+          <div class="modal-actions stats-actions">
+            <span class="save-indicator mono" id="save-indicator" aria-live="polite"></span>
+            <button type="button" class="btn btn-primary" id="btn-save-modal">Save Project Sheet</button>
+            <button type="button" class="btn btn-danger" id="btn-delete-modal">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
 </html>
