@@ -1268,6 +1268,8 @@ label.field > span,
     font-size: 18px; /* Boost base font size */
   }
   .app-header {
+    position: static;
+    background: var(--bg);
     padding: 1.25rem 1rem 0.75rem;
   }
   .cool-title {
