@@ -1,6 +1,11 @@
 name = "tb-atlas"
 main = "worker.js"
 compatibility_date = "2024-09-23"
+workers_dev = false
+
+[[routes]]
+pattern = "www.toddboswell.com/atlas/*"
+zone_name = "toddboswell.com"
 
 [assets]
 directory = "./public"
