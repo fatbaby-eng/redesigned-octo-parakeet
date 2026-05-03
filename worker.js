@@ -10,6 +10,11 @@ const JSON_HEADERS = {
 const ATLAS_PREFIX = "/atlas";
 const API_PREFIX = "/atlas/api";
 
+// Daily ceiling for combined input + output tokens across /reflect and /agent.
+// At Haiku 4.5 pricing (~$1/MTok in, $5/MTok out) this caps you at roughly $1-2/day worst case.
+const DAILY_TOKEN_CAP = 500000;
+const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
+
 function json(data, status = 200, extra = {}) {
   return new Response(JSON.stringify(data), {
     status,
@@ -268,11 +273,55 @@ FORMAT:
 - Use bullets sparingly, only when listing options or steps.
 - End with ONE concrete next action Todd could take today.`;
 
+// Resilient against the table not existing yet (e.g. before the migration runs).
+async function getUsageToday(env) {
+  try {
+    const today = nowIso().slice(0, 10);
+    const row = await env.DB.prepare(
+      "SELECT COALESCE(SUM(input_tokens + output_tokens), 0) AS total FROM usage_log WHERE at LIKE ?"
+    ).bind(today + "%").first();
+    return Number((row && row.total) || 0);
+  } catch (e) {
+    if (e && e.message && e.message.includes("no such table")) return 0;
+    console.warn("usage lookup failed:", e && e.message);
+    return 0;
+  }
+}
+
+async function logUsage(env, endpoint, model, usage) {
+  try {
+    const inT = (usage && (usage.input_tokens || usage.prompt_tokens)) || 0;
+    const outT = (usage && (usage.output_tokens || usage.completion_tokens)) || 0;
+    await env.DB.prepare(
+      "INSERT INTO usage_log (id, at, endpoint, model, input_tokens, output_tokens) VALUES (?, ?, ?, ?, ?, ?)"
+    ).bind(uid("usg"), nowIso(), endpoint, model || "", inT, outT).run();
+  } catch (e) {
+    if (!(e && e.message && e.message.includes("no such table"))) {
+      console.warn("usage log failed:", e && e.message);
+    }
+  }
+}
+
+async function checkSpendCap(env, endpoint) {
+  const today = await getUsageToday(env);
+  if (today >= DAILY_TOKEN_CAP) {
+    return err(
+      "Daily token cap reached for " + endpoint + ": " + today + " / " + DAILY_TOKEN_CAP +
+      " tokens. Resets at midnight UTC.",
+      429
+    );
+  }
+  return null;
+}
+
 async function reflect(env, body) {
   if (!env.ANTHROPIC_API_KEY) return err("ANTHROPIC_API_KEY not set", 503);
   const project = body.project;
   const question = String(body.question || "").trim();
   if (!project || !question) return err("Missing project or question");
+
+  const capError = await checkSpendCap(env, "reflect");
+  if (capError) return capError;
 
   let fetchedUrlText = null;
   if (project.liveUrl) {
@@ -326,7 +375,7 @@ async function reflect(env, body) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
+      model: CLAUDE_MODEL,
       max_tokens: 4000,
       system: REFLECT_SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
@@ -338,6 +387,7 @@ async function reflect(env, body) {
     console.error("Claude API error:", JSON.stringify(data));
     return err(data?.error?.message || "Claude API error", 502);
   }
+  await logUsage(env, "reflect", CLAUDE_MODEL, data.usage);
   const answer = (data.content || [])
     .filter((b) => b.type === "text")
     .map((b) => b.text)
@@ -442,6 +492,10 @@ async function runAgent(env, body) {
   if (!env.ANTHROPIC_API_KEY) return err("ANTHROPIC_API_KEY not set", 503);
   const query = String(body.query || "").trim();
   if (!query) return err("Missing query");
+
+  const capError = await checkSpendCap(env, "agent");
+  if (capError) return capError;
+
   const messages = [{ role: "user", content: query }];
 
   for (let i = 0; i < 3; i++) {
@@ -453,7 +507,7 @@ async function runAgent(env, body) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
+        model: CLAUDE_MODEL,
         max_tokens: 1000,
         system: AGENT_SYSTEM_PROMPT,
         tools: AGENT_TOOLS,
@@ -462,6 +516,7 @@ async function runAgent(env, body) {
     });
     const data = await apiResponse.json();
     if (!apiResponse.ok) return err(data?.error?.message || "Claude API error", 502);
+    await logUsage(env, "agent", CLAUDE_MODEL, data.usage);
     messages.push({ role: "assistant", content: data.content });
 
     let viewPatch = null;
@@ -559,6 +614,13 @@ async function handleApi(request, env, url) {
   }
   if (path === API_PREFIX + "/agent") {
     if (method === "POST") return runAgent(env, await safeJson(request));
+    return err("Method not allowed", 405);
+  }
+  if (path === API_PREFIX + "/usage") {
+    if (method === "GET") {
+      const today = await getUsageToday(env);
+      return json({ today_tokens: today, cap: DAILY_TOKEN_CAP, model: CLAUDE_MODEL });
+    }
     return err("Method not allowed", 405);
   }
   return err("Not found", 404);

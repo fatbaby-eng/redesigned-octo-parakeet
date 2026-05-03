@@ -788,10 +788,33 @@ dialog.modal {
 }
 dialog.modal::backdrop { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(2px); }
 
+/* Project Sheet opens as a full-page view: continuous body scroll, no inner scroll regions. */
+dialog.stats-modal {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+dialog.stats-modal::backdrop { background: var(--bg); backdrop-filter: none; }
+
 .modal-inner {
   display: flex;
   flex-direction: column;
   max-height: min(92dvh, 900px);
+}
+
+dialog.stats-modal .modal-inner {
+  max-height: none;
+  min-height: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-bottom: 4rem;
 }
 
 .btn-close-icon {
@@ -913,8 +936,8 @@ dialog.modal::backdrop { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(2
   gap: 1.5rem;
   padding: 0 1.5rem 1.5rem;
   align-items: start;
-  overflow-y: auto;
 }
+dialog.stats-modal .stats-grid { overflow: visible; }
 
 .stats-section {
   background: var(--bg-sunk);
@@ -1312,7 +1335,7 @@ label.field > span,
 
 /* --------- Activity Log in right sidebar --------- */
 .activity-log-section .log-list {
-  max-height: 420px;
+  max-height: none;
   margin-top: 0.65rem;
 }
 .activity-log-section .quick-log {
@@ -1321,6 +1344,27 @@ label.field > span,
 }
 .activity-log-section .quick-log input {
   font-size: 0.85rem;
+}
+
+/* In full-page card view, every section scrolls with the page (no inner overflow). */
+dialog.stats-modal .log-list,
+dialog.stats-modal .reflect-history,
+dialog.stats-modal .lore-textarea,
+dialog.stats-modal #f-dossier { max-height: none; overflow: visible; }
+dialog.stats-modal .reflect-history-a { max-height: none; }
+dialog.stats-modal .lore-textarea,
+dialog.stats-modal #f-dossier { min-height: 4em; height: auto; }
+
+/* The close button hovers over the page like a back affordance. */
+dialog.stats-modal .btn-close-icon {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  font-size: 1.1rem;
 }
 
 /* --------- Reflection at bottom of main column --------- */

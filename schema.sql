@@ -34,8 +34,18 @@ CREATE TABLE IF NOT EXISTS reflections (
   answer TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS usage_log (
+  id TEXT PRIMARY KEY,
+  at TEXT NOT NULL,
+  endpoint TEXT NOT NULL,
+  model TEXT,
+  input_tokens INTEGER NOT NULL DEFAULT 0,
+  output_tokens INTEGER NOT NULL DEFAULT 0
+);
+
 CREATE INDEX IF NOT EXISTS idx_projects_area ON projects(area);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_log_entries_project_id ON log_entries(project_id);
 CREATE INDEX IF NOT EXISTS idx_log_entries_at ON log_entries(at);
 CREATE INDEX IF NOT EXISTS idx_reflections_project_id ON reflections(project_id);
+CREATE INDEX IF NOT EXISTS idx_usage_log_at ON usage_log(at);

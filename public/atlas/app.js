@@ -1118,6 +1118,8 @@
     renderLinksEditor(p.links);
     renderRelatedEditor(p.related);
 
+    autoSizeTextareas();
+
     // Load log + reflections (online if possible, else local mirror)
     state.currentLog = (p._log && p._log.length) ? p._log.slice() : [];
     state.currentReflections = [];
@@ -1173,6 +1175,7 @@
     document.getElementById("quick-log-input").value = "";
     document.getElementById("project-modal").showModal();
     document.getElementById("f-title").focus();
+    autoSizeTextareas();
     clearDirty();
     setSaveIndicator("draft");
   }
@@ -1388,6 +1391,18 @@
       item.addEventListener("click", function () { item.classList.toggle("expanded"); });
       el.appendChild(item);
     });
+  }
+
+  // Grow textareas to fit content so the modal scrolls as one page,
+  // not as a stack of independently-scrolling boxes.
+  function autoSize(el) {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = (el.scrollHeight + 2) + "px";
+  }
+  function autoSizeTextareas() {
+    var ids = ["f-notes", "f-dossier", "reflect-question"];
+    ids.forEach(function (id) { autoSize(document.getElementById(id)); });
   }
 
   function setSaveIndicator(status) {
@@ -1872,7 +1887,10 @@
       if (!t || EXCLUDE_IDS[t.id]) return;
       if (t.matches("input, textarea, select")) markDirty();
     };
-    modalEl.addEventListener("input", dirtyHandler);
+    modalEl.addEventListener("input", function (e) {
+      dirtyHandler(e);
+      if (e.target && e.target.tagName === "TEXTAREA") autoSize(e.target);
+    });
     modalEl.addEventListener("change", dirtyHandler);
     // Adding/removing list-editor rows is a click; treat as dirty.
     ["paths-editor", "links-editor", "related-editor"].forEach(function (id) {
