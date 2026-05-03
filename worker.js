@@ -581,12 +581,11 @@ async function serveStatic(request, env, url) {
       { status: 500, headers: { "Content-Type": "text/plain; charset=utf-8" } }
     );
   }
-  let subPath = url.pathname.slice(ATLAS_PREFIX.length) || "/";
-  if (subPath === "" || subPath === "/") subPath = "/index.html";
-  const assetUrl = new URL(subPath, url.origin);
-  assetUrl.search = url.search;
-  const assetRequest = new Request(assetUrl.toString(), request);
-  return env.ASSETS.fetch(assetRequest);
+  if (url.pathname === ATLAS_PREFIX || url.pathname === ATLAS_PREFIX + "/") {
+    const indexUrl = new URL(ATLAS_PREFIX + "/index.html", url.origin);
+    return env.ASSETS.fetch(new Request(indexUrl.toString(), request));
+  }
+  return env.ASSETS.fetch(request);
 }
 
 export default {
