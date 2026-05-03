@@ -334,6 +334,37 @@
     else if (state.view === "dashboard") renderDashboard(filtered);
     else if (state.view === "tech") renderTech(filtered);
     else if (state.view === "timeline") renderTimeline(filtered);
+
+    renderDupBanner();
+  }
+
+  function renderDupBanner() {
+    var el = document.getElementById("dup-banner");
+    if (!el) return;
+    var groups = findDuplicateGroups(state.projects);
+    if (groups.length === 0) {
+      el.hidden = true;
+      return;
+    }
+    var totalExtra = groups.reduce(function (n, g) { return n + (g.items.length - 1); }, 0);
+    var titles = groups.map(function (g) { return g.items[0].title; }).slice(0, 3).join(", ");
+    if (groups.length > 3) titles += ", and " + (groups.length - 3) + " more";
+    el.innerHTML =
+      '<span class="dup-banner-msg">' +
+        '<strong>' + groups.length + ' duplicate group' + (groups.length === 1 ? '' : 's') + '</strong> ' +
+        '(' + totalExtra + ' extra card' + (totalExtra === 1 ? '' : 's') + '): ' + escapeHtml(titles) +
+      '</span>' +
+      '<button type="button" class="btn btn-primary" id="btn-dup-merge">Combine duplicates</button>' +
+      '<button type="button" class="btn btn-ghost" id="btn-dup-dismiss" aria-label="Dismiss">×</button>';
+    el.hidden = false;
+    document.getElementById("btn-dup-merge").addEventListener("click", function () {
+      if (!confirm("Auto-merge " + groups.length + " duplicate group" + (groups.length === 1 ? "" : "s") +
+                   "? The richest card in each group is kept; others are folded in and deleted.")) return;
+      autoMergeDuplicates();
+    });
+    document.getElementById("btn-dup-dismiss").addEventListener("click", function () {
+      el.hidden = true;
+    });
   }
 
   // ============================================================
@@ -1638,16 +1669,118 @@
     return null;
   }
 
+  // Find groups of likely-duplicate projects (case-insensitive title match).
+  function findDuplicateGroups(projects) {
+    var by = {};
+    (projects || []).forEach(function (p) {
+      var key = (p.title || "").trim().toLowerCase();
+      if (!key) return;
+      (by[key] = by[key] || []).push(p);
+    });
+    var out = [];
+    Object.keys(by).forEach(function (k) {
+      if (by[k].length > 1) out.push({ key: k, items: by[k] });
+    });
+    return out;
+  }
+
+  // Pick the "richest" record in a group as the survivor.
+  function pickWinner(items) {
+    return items.slice().sort(function (a, b) {
+      var aThumb = a.thumbnail ? 1 : 0, bThumb = b.thumbnail ? 1 : 0;
+      if (aThumb !== bThumb) return bThumb - aThumb;
+      var aLen = ((a.dossier || "") + (a.notes || "")).length;
+      var bLen = ((b.dossier || "") + (b.notes || "")).length;
+      if (aLen !== bLen) return bLen - aLen;
+      var aLinks = (a.links || []).length, bLinks = (b.links || []).length;
+      if (aLinks !== bLinks) return bLinks - aLinks;
+      return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+    })[0];
+  }
+
+  // Merge loser's data into winner without losing anything informative.
+  function combineProjects(winner, loser) {
+    var out = Object.assign({}, winner);
+    ["notes", "dossier", "nextAction", "liveUrl", "primaryPath", "thumbnail"].forEach(function (k) {
+      var w = winner[k] || "", l = loser[k] || "";
+      if (l && l.length > w.length) out[k] = l;
+    });
+    ["stack", "tags", "docPaths", "related"].forEach(function (k) {
+      var seen = {}, merged = [];
+      (winner[k] || []).concat(loser[k] || []).forEach(function (v) {
+        var key = String(v).trim().toLowerCase();
+        if (!key || seen[key]) return;
+        seen[key] = true;
+        merged.push(v);
+      });
+      out[k] = merged;
+    });
+    var seen = {}, links = [];
+    (winner.links || []).concat(loser.links || []).forEach(function (link) {
+      if (!link || (!link.url && !link.label)) return;
+      var key = (link.url || link.label).toLowerCase();
+      if (seen[key]) return;
+      seen[key] = true;
+      links.push(link);
+    });
+    out.links = links;
+    out.pinned = !!(winner.pinned || loser.pinned);
+    return out;
+  }
+
+  // Auto-merge every duplicate group: keep the richest record, fold in the rest, delete losers.
+  function autoMergeDuplicates() {
+    var groups = findDuplicateGroups(state.projects);
+    if (groups.length === 0) { toast("No duplicates"); return; }
+    var totalLosers = 0;
+    groups.forEach(function (g) {
+      var winner = pickWinner(g.items);
+      g.items.forEach(function (item) {
+        if (item.id === winner.id) return;
+        winner = combineProjects(winner, item);
+      });
+      // Apply merged winner to local state + server.
+      var idx = state.projects.findIndex(function (p) { return p.id === winner.id; });
+      if (idx >= 0) state.projects[idx] = winner;
+      persistUpdate(winner);
+      // Drop losers.
+      g.items.forEach(function (item) {
+        if (item.id === winner.id) return;
+        state.projects = state.projects.filter(function (p) { return p.id !== item.id; });
+        persistDelete(item.id);
+        totalLosers++;
+      });
+    });
+    saveToStorage();
+    render();
+    toast("Combined " + totalLosers + " duplicate" + (totalLosers === 1 ? "" : "s"));
+  }
+
   // Upsert by id: update if id matches an existing project, otherwise create.
   function mergeImported(data) {
     var list = importPayloadToList(data);
     if (!list) { toast("Invalid file", true); return; }
     var byId = {};
-    state.projects.forEach(function (p, i) { byId[p.id] = i; });
+    var byTitle = {};
+    state.projects.forEach(function (p, i) {
+      byId[p.id] = i;
+      var t = (p.title || "").trim().toLowerCase();
+      if (t && !(t in byTitle)) byTitle[t] = i;
+    });
 
-    var updated = 0, created = 0;
+    var updated = 0, created = 0, mergedByTitle = 0;
     list.forEach(function (raw) {
       var idx = raw && raw.id ? byId[raw.id] : undefined;
+      // Title-match fallback: if id doesn't exist locally but a project with
+      // the same title does, fold the imported record into that one instead
+      // of creating a duplicate.
+      if (idx === undefined) {
+        var t = ((raw && raw.title) || "").trim().toLowerCase();
+        if (t && t in byTitle) {
+          idx = byTitle[t];
+          mergedByTitle++;
+        }
+      }
       if (idx !== undefined) {
         var existing = state.projects[idx];
         var merged = normalizeProject(Object.assign({}, existing, raw, {
@@ -1666,6 +1799,8 @@
         if (!n.id) n.id = uid();
         while (byId[n.id] !== undefined) { n.id = uid(); }
         byId[n.id] = state.projects.length;
+        var nt = (n.title || "").trim().toLowerCase();
+        if (nt && !(nt in byTitle)) byTitle[nt] = state.projects.length;
         state.projects.push(n);
         if (state.online) {
           apiFetch("/projects", { method: "POST", body: JSON.stringify(n) }).catch(function () {});
@@ -1678,6 +1813,7 @@
     var parts = [];
     if (updated) parts.push("updated " + updated);
     if (created) parts.push("created " + created);
+    if (mergedByTitle) parts.push(mergedByTitle + " by title");
     toast("Import: " + (parts.join(", ") || "no changes"));
   }
 
