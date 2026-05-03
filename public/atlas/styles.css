@@ -1392,6 +1392,117 @@ dialog.stats-modal .btn-close-icon {
 .stats-section { transition: border-color 0.15s ease; }
 .stats-section:focus-within { border-color: var(--accent-soft, var(--border)); }
 
+/* --------- Report modal --------- */
+dialog.report-modal {
+  width: min(100% - 1.5rem, 800px);
+  max-height: min(92dvh, 1000px);
+}
+dialog.report-modal .report-inner {
+  max-height: min(92dvh, 1000px);
+  overflow-y: auto;
+}
+.report-toolbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  z-index: 5;
+}
+.report-toolbar .btn-close-icon {
+  position: static;
+  margin-left: auto;
+}
+.report-content {
+  padding: 1.5rem 1.75rem 2.5rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.report-content h1 {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 2.2rem;
+  margin: 0 0 0.25rem;
+  color: var(--accent);
+  font-weight: 400;
+}
+.report-content h2 {
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 1.6rem 0 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+.report-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.2rem 0 0.4rem;
+  color: var(--accent);
+}
+.report-content p { margin: 0.5rem 0; }
+.report-content ul { margin: 0.4rem 0 0.8rem 1.25rem; padding: 0; }
+.report-content li { margin: 0.2rem 0; }
+.report-content a { color: var(--accent); text-decoration: underline; }
+.report-content code {
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.85rem;
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+}
+.report-content pre {
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+.report-content pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.report-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0 1rem;
+}
+
+/* When the user prints, hide the rest of the page and serve the report black-on-white. */
+@media print {
+  body * { visibility: hidden !important; }
+  dialog.report-modal,
+  dialog.report-modal *,
+  .report-content,
+  .report-content * { visibility: visible !important; }
+  dialog.report-modal {
+    position: absolute !important;
+    left: 0 !important; top: 0 !important;
+    width: 100% !important; max-width: 100% !important;
+    max-height: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+  dialog.report-modal::backdrop { display: none !important; }
+  .report-inner { max-height: none !important; overflow: visible !important; }
+  .report-toolbar { display: none !important; }
+  .report-content { padding: 0 !important; color: black !important; }
+  .report-content * { color: black !important; background: transparent !important; border-color: #999 !important; }
+  .report-content h1, .report-content h2, .report-content h3, .report-content a { color: black !important; }
+  .report-content a { text-decoration: underline; }
+  .report-content code, .report-content pre { background: #f4f4f4 !important; border-color: #ccc !important; }
+}
+
 /* --------- AI Spend monitor --------- */
 .spend-headline {
   display: grid;

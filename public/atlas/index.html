@@ -9,7 +9,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Atlas — Todd's project map</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
   <!-- Agent strip acting as a toast popup -->
@@ -279,6 +279,7 @@
           <div class="modal-actions stats-actions">
             <span class="save-indicator mono" id="save-indicator" aria-live="polite"></span>
             <button type="button" class="btn btn-primary" id="btn-save-modal">Save Project Sheet</button>
+            <button type="button" class="btn" id="btn-report-modal">Report</button>
             <button type="button" class="btn btn-danger" id="btn-delete-modal">Delete</button>
           </div>
         </div>
@@ -286,8 +287,20 @@
     </div>
   </dialog>
 
+  <!-- Report modal: printable / copyable summary of a single project -->
+  <dialog class="modal report-modal" id="report-modal" aria-labelledby="report-title">
+    <div class="modal-inner report-inner">
+      <div class="report-toolbar" id="report-toolbar">
+        <button type="button" class="btn btn-primary" id="btn-report-copy">Copy as Markdown</button>
+        <button type="button" class="btn" id="btn-report-print">Print / Save PDF</button>
+        <button type="button" class="btn-close-icon" id="btn-report-close" aria-label="Close">×</button>
+      </div>
+      <div id="report-content" class="report-content"></div>
+    </div>
+  </dialog>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
