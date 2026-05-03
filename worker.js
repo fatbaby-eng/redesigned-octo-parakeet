@@ -302,6 +302,74 @@ async function logUsage(env, endpoint, model, usage) {
   }
 }
 
+// Haiku 4.5 list pricing as of late 2025: $1 / MTok input, $5 / MTok output.
+const PRICE_INPUT_PER_TOKEN = 1 / 1_000_000;
+const PRICE_OUTPUT_PER_TOKEN = 5 / 1_000_000;
+
+function estimateCostUsd(inT, outT) {
+  return inT * PRICE_INPUT_PER_TOKEN + outT * PRICE_OUTPUT_PER_TOKEN;
+}
+
+async function getUsageReport(env) {
+  const today = nowIso().slice(0, 10);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  const empty = {
+    today: { date: today, input_tokens: 0, output_tokens: 0, total_tokens: 0, requests: 0, estimated_cost_usd: 0 },
+    cap: DAILY_TOKEN_CAP,
+    model: CLAUDE_MODEL,
+    pricing: { input_per_mtok: 1, output_per_mtok: 5, currency: "USD" },
+    by_endpoint_today: [],
+    week: [],
+  };
+  try {
+    const todayRowP = env.DB.prepare(
+      "SELECT COALESCE(SUM(input_tokens),0) AS input_tokens, COALESCE(SUM(output_tokens),0) AS output_tokens, COUNT(*) AS requests FROM usage_log WHERE at LIKE ?"
+    ).bind(today + "%").first();
+    const byEndpointP = env.DB.prepare(
+      "SELECT endpoint, COALESCE(SUM(input_tokens),0) AS input_tokens, COALESCE(SUM(output_tokens),0) AS output_tokens, COUNT(*) AS requests FROM usage_log WHERE at LIKE ? GROUP BY endpoint"
+    ).bind(today + "%").all();
+    const weekP = env.DB.prepare(
+      "SELECT substr(at,1,10) AS day, COALESCE(SUM(input_tokens),0) AS input_tokens, COALESCE(SUM(output_tokens),0) AS output_tokens, COUNT(*) AS requests FROM usage_log WHERE substr(at,1,10) >= ? GROUP BY day ORDER BY day"
+    ).bind(sevenDaysAgo).all();
+    const [todayRow, byEndpoint, week] = await Promise.all([todayRowP, byEndpointP, weekP]);
+    const inT = Number(todayRow?.input_tokens || 0);
+    const outT = Number(todayRow?.output_tokens || 0);
+    return json({
+      today: {
+        date: today,
+        input_tokens: inT,
+        output_tokens: outT,
+        total_tokens: inT + outT,
+        requests: Number(todayRow?.requests || 0),
+        estimated_cost_usd: estimateCostUsd(inT, outT),
+      },
+      cap: DAILY_TOKEN_CAP,
+      model: CLAUDE_MODEL,
+      pricing: { input_per_mtok: 1, output_per_mtok: 5, currency: "USD" },
+      by_endpoint_today: (byEndpoint?.results || []).map((r) => ({
+        endpoint: r.endpoint,
+        input_tokens: Number(r.input_tokens || 0),
+        output_tokens: Number(r.output_tokens || 0),
+        requests: Number(r.requests || 0),
+        estimated_cost_usd: estimateCostUsd(Number(r.input_tokens || 0), Number(r.output_tokens || 0)),
+      })),
+      week: (week?.results || []).map((r) => ({
+        date: r.day,
+        input_tokens: Number(r.input_tokens || 0),
+        output_tokens: Number(r.output_tokens || 0),
+        total_tokens: Number(r.input_tokens || 0) + Number(r.output_tokens || 0),
+        requests: Number(r.requests || 0),
+        estimated_cost_usd: estimateCostUsd(Number(r.input_tokens || 0), Number(r.output_tokens || 0)),
+      })),
+    });
+  } catch (e) {
+    if (e && e.message && e.message.includes("no such table")) {
+      return json(empty);
+    }
+    return err("Usage lookup failed: " + (e && e.message), 500);
+  }
+}
+
 async function checkSpendCap(env, endpoint) {
   const today = await getUsageToday(env);
   if (today >= DAILY_TOKEN_CAP) {
@@ -617,10 +685,7 @@ async function handleApi(request, env, url) {
     return err("Method not allowed", 405);
   }
   if (path === API_PREFIX + "/usage") {
-    if (method === "GET") {
-      const today = await getUsageToday(env);
-      return json({ today_tokens: today, cap: DAILY_TOKEN_CAP, model: CLAUDE_MODEL });
-    }
+    if (method === "GET") return getUsageReport(env);
     return err("Method not allowed", 405);
   }
   return err("Not found", 404);

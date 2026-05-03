@@ -9,7 +9,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Atlas — Todd's project map</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <!-- Agent strip acting as a toast popup -->
@@ -101,6 +101,12 @@
           <div class="heatmap-wrapper">
             <svg id="heatmap-svg" class="heatmap-chart"></svg>
           </div>
+        </div>
+
+        <!-- AI Spend Monitor (Wide) -->
+        <div class="bento-box bento-wide glass-panel" id="bento-spend">
+          <h3 class="bento-title">AI SPEND</h3>
+          <div id="bento-spend-body">Loading…</div>
         </div>
 
         <!-- Project Spread Map Widget (Full) -->
@@ -282,6 +288,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

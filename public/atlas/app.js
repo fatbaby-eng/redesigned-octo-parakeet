@@ -513,7 +513,71 @@
   // ============================================================
   // Dashboard view (Bento Box + Heatmap)
   // ============================================================
+  function renderSpend(report) {
+    var el = document.getElementById("bento-spend-body");
+    if (!el) return;
+    if (!report) { el.innerHTML = '<div style="color:var(--text-dim)">Spend data unavailable.</div>'; return; }
+    var t = report.today || {};
+    var cap = report.cap || 1;
+    var pct = Math.min(100, Math.round(((t.total_tokens || 0) / cap) * 100));
+    var cost = (t.estimated_cost_usd || 0).toFixed(4);
+    var byEp = report.by_endpoint_today || [];
+    var week = report.week || [];
+
+    var endpointRows = byEp.length
+      ? byEp.map(function (r) {
+          return '<tr>' +
+            '<td>' + escapeHtml(r.endpoint) + '</td>' +
+            '<td>' + (r.requests || 0) + '</td>' +
+            '<td>' + (r.input_tokens || 0).toLocaleString() + '</td>' +
+            '<td>' + (r.output_tokens || 0).toLocaleString() + '</td>' +
+            '<td>$' + (r.estimated_cost_usd || 0).toFixed(4) + '</td>' +
+          '</tr>';
+        }).join('')
+      : '<tr><td colspan="5" style="color:var(--text-dim)">No calls today.</td></tr>';
+
+    var maxTokens = week.reduce(function (m, d) { return Math.max(m, d.total_tokens || 0); }, 1);
+    var weekBars = week.length
+      ? week.map(function (d) {
+          var h = Math.max(2, Math.round(((d.total_tokens || 0) / maxTokens) * 60));
+          return '<div class="spend-bar" title="' + escapeHtml(d.date) + ': ' + (d.total_tokens||0).toLocaleString() +
+                 ' tokens · $' + (d.estimated_cost_usd||0).toFixed(4) + '">' +
+                   '<span class="spend-bar-fill" style="height:' + h + 'px"></span>' +
+                   '<span class="spend-bar-day">' + d.date.slice(5) + '</span>' +
+                 '</div>';
+        }).join('')
+      : '<div style="color:var(--text-dim);font-size:.85rem">No calls in the last 7 days.</div>';
+
+    el.innerHTML =
+      '<div class="spend-headline">' +
+        '<div class="spend-stat"><span class="spend-stat-num">' + (t.total_tokens||0).toLocaleString() + '</span>' +
+          '<span class="spend-stat-lbl">tokens today</span></div>' +
+        '<div class="spend-stat"><span class="spend-stat-num">$' + cost + '</span>' +
+          '<span class="spend-stat-lbl">est. cost today</span></div>' +
+        '<div class="spend-stat"><span class="spend-stat-num">' + (t.requests||0) + '</span>' +
+          '<span class="spend-stat-lbl">requests today</span></div>' +
+        '<div class="spend-stat"><span class="spend-stat-num">' + pct + '%</span>' +
+          '<span class="spend-stat-lbl">of daily cap</span></div>' +
+      '</div>' +
+      '<div class="spend-cap-bar"><span style="width:' + pct + '%"></span></div>' +
+      '<div class="spend-cap-meta">' + (t.total_tokens||0).toLocaleString() + ' / ' + cap.toLocaleString() +
+        ' token cap · model: ' + escapeHtml(report.model || 'unknown') + '</div>' +
+      '<div class="spend-week"><div class="spend-week-title">LAST 7 DAYS</div>' +
+        '<div class="spend-bars">' + weekBars + '</div>' +
+      '</div>' +
+      '<details class="spend-details"><summary>Today by endpoint</summary>' +
+        '<table class="spend-table"><thead><tr>' +
+          '<th>endpoint</th><th>req</th><th>input</th><th>output</th><th>$</th>' +
+        '</tr></thead><tbody>' + endpointRows + '</tbody></table>' +
+      '</details>';
+  }
+
+  function loadSpendReport() {
+    apiFetch("/usage").then(renderSpend, function () { renderSpend(null); });
+  }
+
   function renderDashboard(list) {
+    loadSpendReport();
     // 1. Now Widget
     var bentoNow = document.getElementById("bento-now-body");
     bentoNow.innerHTML = "";

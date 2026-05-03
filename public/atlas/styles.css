@@ -56,14 +56,11 @@ a:hover { text-decoration: underline; }
 
 /* --------- Header --------- */
 .app-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: linear-gradient(180deg, var(--bg) 78%, transparent);
+  position: static;
+  background: var(--bg);
   padding: 1rem 1rem 0.5rem;
   padding-top: calc(1rem + env(safe-area-inset-top, 0));
   border-bottom: 1px solid transparent;
-  backdrop-filter: blur(6px);
 }
 
 .header-top {
@@ -1268,8 +1265,6 @@ label.field > span,
     font-size: 18px; /* Boost base font size */
   }
   .app-header {
-    position: static;
-    background: var(--bg);
     padding: 1.25rem 1rem 0.75rem;
   }
   .cool-title {
@@ -1396,6 +1391,123 @@ dialog.stats-modal .btn-close-icon {
 .stats-section + .stats-section { margin-top: 0; }
 .stats-section { transition: border-color 0.15s ease; }
 .stats-section:focus-within { border-color: var(--accent-soft, var(--border)); }
+
+/* --------- AI Spend monitor --------- */
+.spend-headline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.spend-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.spend-stat-num {
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 1.4rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+.spend-stat-lbl {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.spend-cap-bar {
+  position: relative;
+  height: 6px;
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+.spend-cap-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #d97a55);
+  transition: width 0.3s ease;
+}
+.spend-cap-meta {
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+.spend-week-title {
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+.spend-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  height: 80px;
+}
+.spend-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: help;
+}
+.spend-bar-fill {
+  display: block;
+  width: 100%;
+  background: linear-gradient(180deg, var(--accent), rgba(212, 165, 116, 0.4));
+  border-radius: 2px;
+  min-height: 2px;
+  transition: filter 0.15s ease;
+}
+.spend-bar:hover .spend-bar-fill { filter: brightness(1.2); }
+.spend-bar-day {
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  color: var(--text-faint);
+}
+.spend-details {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+.spend-details summary {
+  cursor: pointer;
+  color: var(--text-dim);
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 0;
+}
+.spend-details summary:hover { color: var(--text); }
+.spend-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+.spend-table th, .spend-table td {
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.spend-table th {
+  color: var(--text-dim);
+  font-weight: normal;
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
 /* --------- Duplicate banner --------- */
 .dup-banner {
