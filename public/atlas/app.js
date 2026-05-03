@@ -159,25 +159,43 @@
     }
   }
 
-  function setConn(online) {
+  function setConn(online, reason) {
     state.online = !!online;
+    state.connReason = reason || "";
     var el = document.getElementById("conn-status");
     if (el) {
       el.setAttribute("data-state", online ? "online" : "offline");
       el.querySelector(".conn-label").textContent = online ? "cloud" : "local";
+      if (!online && reason) el.title = "Offline: " + reason;
+      else el.title = online ? "Connected to D1" : "Local-only mode";
     }
     // Reflect button: only works when cloud is connected
     var btn = document.getElementById("btn-reflect");
     if (btn) {
       btn.disabled = !online;
-      btn.title = online ? "" : "Reflect needs cloud mode — deploy the Worker first.";
+      btn.title = online ? "" : "Reflect needs cloud mode — tap the cloud/local pill to retry.";
       // Idle label when offline and not already showing an error
       var statusEl = document.getElementById("reflect-status");
       if (statusEl && !state.reflectBusy && !statusEl.classList.contains("error")) {
-        statusEl.textContent = online ? "" : "Offline — deploy to enable.";
+        statusEl.textContent = online ? "" : ("Offline" + (reason ? " (" + reason + ")" : "") + " — tap cloud/local in header to retry.");
         statusEl.className = "reflect-status mono" + (online ? "" : " offline");
       }
     }
+  }
+
+  // Manually re-test the connection. Wired to the cloud/local pill in the header
+  // and to visibility/focus events so coming back from a phone lock retries.
+  function recheckConnection() {
+    return tryOnlineList().then(
+      function (list) {
+        state.projects = list.map(normalizeProject);
+        saveToStorage();
+        render();
+      },
+      function (e) {
+        setConn(false, (e && e.message) ? e.message.slice(0, 80) : "fetch failed");
+      }
+    );
   }
 
   // PATCH: apiFetch now sends the Authorization header so the Worker
@@ -187,7 +205,6 @@
     opts = opts || {};
     opts.headers = Object.assign({
       "Content-Type": "application/json",
-      "Authorization": "Basic " + btoa("todd:fatbaby")
     }, opts.headers || {});
     return fetch(API_BASE + path, opts).then(function (r) {
       if (!r.ok) return r.json().then(function (j) { throw new Error(j.error || ("HTTP " + r.status)); }, function () { throw new Error("HTTP " + r.status); });
@@ -221,8 +238,8 @@
         saveToStorage();
         render();
       },
-      function () {
-        setConn(false);
+      function (e) {
+        setConn(false, (e && e.message) ? e.message.slice(0, 80) : "fetch failed");
         if (state.projects.length === 0) {
           fetchSeedJson().then(function (seed) {
             state.projects = (seed.projects || []).map(normalizeProject);
@@ -232,6 +249,23 @@
         }
       }
     );
+
+    // Auto-retry when the page becomes visible again (e.g. unlocking phone)
+    // or when the browser reports network back online.
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden && !state.online) recheckConnection();
+    });
+    window.addEventListener("online", function () { recheckConnection(); });
+
+    // Tap the cloud/local pill to retry on demand.
+    var connEl = document.getElementById("conn-status");
+    if (connEl) {
+      connEl.style.cursor = "pointer";
+      connEl.addEventListener("click", function () {
+        connEl.querySelector(".conn-label").textContent = "checking…";
+        recheckConnection();
+      });
+    }
   }
 
   // CRUD helpers — always update local state + localStorage; mirror to API if online.
