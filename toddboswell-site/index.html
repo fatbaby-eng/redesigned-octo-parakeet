@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="description" content="Todd Boswell — Independent designer, builder, and AI tooling consultant in Omaha, Nebraska. Fatbaby Design. 30+ years of brand systems, design leadership, and making things.">
+<meta name="theme-color" content="#0f0f0f">
+<title>Todd Boswell — Design Leader, Builder, Omaha</title>
+<style>
+/* =========================================================
+   DESIGN SYSTEM — Editorial Dark
+   ========================================================= */
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-raised: #1c1c1c;
+  --surface-hover: #242424;
+  --text: #e8e6e3;
+  --text-muted: #8a8580;
+  --text-faint: #5a5550;
+  --accent: #c4a35a;
+  --accent-soft: rgba(196, 163, 90, 0.10);
+  --accent-glow: rgba(196, 163, 90, 0.25);
+  --border: rgba(232, 230, 227, 0.07);
+  --border-strong: rgba(232, 230, 227, 0.15);
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
+  --radius: 4px;
+  --transition: 0.2s ease;
+}
+
+[data-vibe="midwest"] {
+  --bg: #f5f2ed;
+  --surface: #ebe7e0;
+  --surface-raised: #e0dbd2;
+  --surface-hover: #d5cfc5;
+  --text: #1a1a1a;
+  --text-muted: #6b6560;
+  --text-faint: #9a9590;
+  --accent: #8b4513;
+  --accent-soft: rgba(139, 69, 19, 0.08);
+  --accent-glow: rgba(139, 69, 19, 0.15);
+  --border: rgba(26, 26, 26, 0.08);
+  --border-strong: rgba(26, 26, 26, 0.15);
+}
+
+[data-vibe="brutalist"] {
+  --bg: #ffffff;
+  --surface: #f0f0f0;
+  --surface-raised: #e0e0e0;
+  --surface-hover: #d0d0d0;
+  --text: #000000;
+  --text-muted: #666666;
+  --text-faint: #999999;
+  --accent: #ff0000;
+  --accent-soft: rgba(255, 0, 0, 0.08);
+  --accent-glow: rgba(255, 0, 0, 0.15);
+  --border: #000000;
+  --border-strong: #000000;
+}
+
+[data-vibe="retrowave"] {
+  --bg: #0f0518;
+  --surface: #1a0b2e;
+  --surface-raised: #240e42;
+  --surface-hover: #2e1456;
+  --text: #f0e6ff;
+  --text-muted: #b8a0d0;
+  --text-faint: #8060a0;
+  --accent: #ff00a0;
+  --accent-soft: rgba(255, 0, 160, 0.10);
+  --accent-glow: rgba(255, 0, 160, 0.25);
+  --border: rgba(240, 230, 255, 0.08);
+  --border-strong: rgba(240, 230, 255, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+img, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+svg {
+  fill: currentColor;
+  transition: fill 0.4s ease;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  opacity: 0.75;
+}
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container { padding: 0 3rem; }
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.25;
+  margin-bottom: 2rem;
+  color: var(--text);
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================
+   HEADER / SYSTEM BAR
+   ========================================================= */
+
+.system-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.4s ease;
+}
+
+[data-vibe="midwest"] .system-bar,
+[data-vibe="brutalist"] .system-bar {
+  background: rgba(245, 242, 237, 0.85);
+}
+
+[data-vibe="retrowave"] .system-bar {
+  background: rgba(15, 5, 24, 0.85);
+}
+
+.system-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 1.5rem;
+}
+
+.brand-mark {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+
+.brand-mark span {
+  color: var(--accent);
+}
+
+.nav-links {
+  display: none;
+  gap: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text);
+  border-radius: 1px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.hamburger[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.nav-links.mobile-open {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 52px;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  gap: 1rem;
+  z-index: 999;
+}
+
+@media (min-width: 768px) {
+  .hamburger { display: none; }
+  .nav-links { display: flex; }
+  .nav-links.mobile-open { position: static; flex-direction: row; background: none; border: none; padding: 0; gap: 2rem; }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vibe-btn {
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.vibe-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* =========================================================
+   HERO — WITH BACKGROUND IMAGE
+   ========================================================= */
+
+.hero {
+  min-height: auto;
+  padding: 5rem 1.5rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .hero {
+    padding: 6rem 3rem 3rem;
+  }
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 60vw;
+  height: 60vw;
+  max-width: 500px;
+  max-height: 500px;
+  background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-split {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .hero-split {
+    flex-direction: row;
+    align-items: center;
+    gap: 3rem;
+    min-height: 75vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-split { gap: 4rem; }
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-portrait {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  position: relative;
+  order: -1;
+}
+
+@media (min-width: 768px) {
+  .hero-portrait {
+    flex: 0 0 40%;
+    max-width: 420px;
+    order: 0;
+    margin: 0;
+  }
+}
+
+.hero-portrait img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.hero-portrait img.fading { opacity: 0; }
+
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 7vw, 3.8rem);
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  max-width: 900px;
+  margin-bottom: 1.75rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-lead {
+  font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin-bottom: 1.25rem;
+}
+
+.hero-note {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin-bottom: 3rem;
+  font-style: italic;
+  font-family: var(--font-display);
+  line-height: 1.6;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  animation: pulse 3s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.6; }
+}
+
+/* =========================================================
+   CRED BAR
+   ========================================================= */
+
+.cred-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  justify-content: center;
+}
+
+.cred-bar span {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cred-bar span::before {
+  content: "// ";
+  color: var(--accent);
+  opacity: 0.5;
+}
+
+@media (min-width: 640px) {
+  .cred-bar { justify-content: flex-start; padding: 1.25rem 3rem; }
+}
+
+/* =========================================================
+   ABOUT
+   ========================================================= */
+
+.about {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  margin: 2rem 0;
+}
+
+@media (min-width: 640px) {
+  .about { padding-top: 6rem; padding-bottom: 6rem; margin: 3rem 0; }
+}
+
+.about .lead {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+  font-style: italic;
+}
+
+.about p {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 640px;
+}
+
+.about p strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.about .closing {
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+/* =========================================================
+   ROOMS NAVIGATION
+   ========================================================= */
+
+.rooms-nav {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .rooms-nav { padding-top: 5rem; padding-bottom: 5rem; }
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.room-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.room-card:hover {
+  background: var(--surface-raised);
+  border-color: var(--border-strong);
+  transform: translateX(4px);
+}
+
+.room-num {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  min-width: 2.5rem;
+  flex-shrink: 0;
+}
+
+.room-info {
+  flex: 1;
+}
+
+.room-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--text);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.room-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.room-arrow {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-faint);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.room-card:hover .room-arrow {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+@media (min-width: 768px) {
+  .rooms-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* =========================================================
+   STUDIO — CAREER SECTION
+   ========================================================= */
+
+.studio {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .studio { padding-top: 5rem; padding-bottom: 5rem; }
+}
+
+.timeline {
+  position: relative;
+  margin-top: 3rem;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-strong);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 3rem;
+  padding-left: 2rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -1.5rem;
+  top: 0.5rem;
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px var(--border-strong);
+}
+
+.timeline-era {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.timeline-body {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+  max-width: 560px;
+}
+
+.timeline-body p {
+  margin-bottom: 0.75rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .stats-row { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   WORKSHOP — TOOLS & CHAT
+   ========================================================= */
+
+.workshop {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .workshop { padding-top: 5rem; padding-bottom: 5rem; }
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 640px) {
+  .tools-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  transition: var(--transition);
+}
+
+.tool-card:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+}
+
+.tool-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.tool-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.tool-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.tool-note {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* =========================================================
+   SHOP / GARDEN / DARKROOM / ARCADE / QUIET
+   ========================================================= */
+
+.content-section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .content-section { padding-top: 5rem; padding-bottom: 5rem; }
+}
+
+.content-section p {
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-bottom: 1.5rem;
+  line-height: 1.75;
+}
+
+.content-section a.action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 0.5rem;
+}
+
+.part-2-note {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: inline-block;
+}
+
+/* =========================================================
+   DARKROOM — LIVE IMAGE FEED GALLERY
+   ========================================================= */
+
+.darkroom-feed {
+  margin-top: 2.5rem;
+}
+
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .feed-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .feed-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.feed-cell {
+  aspect-ratio: 4 / 3;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.feed-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-raised) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: feedPulse 1.5s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.feed-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.feed-cell img.loaded {
+  opacity: 1;
+}
+
+.feed-cell:has(img.loaded)::before {
+  display: none;
+}
+
+.feed-cell img.swapping {
+  opacity: 0;
+}
+
+@keyframes feedPulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.feed-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  margin-top: 1rem;
+  letter-spacing: 0.1em;
+  min-height: 1.2rem;
+}
+
+/* =========================================================
+   ARCADE
+   ========================================================= */
+
+.cartridge-deck {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 640px) {
+  .cartridge-deck { grid-template-columns: repeat(4, 1fr); }
+}
+
+.cartridge {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: block;
+}
+
+.cartridge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.cartridge-icon {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto 0.5rem;
+}
+
+/* =========================================================
+   GAME OVERLAY
+   ========================================================= */
+
+.game-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  display: none;
+  flex-direction: column;
+}
+
+.game-overlay.open {
+  display: flex;
+}
+
+.game-overlay-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: #111;
+  border-bottom: 1px solid #333;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.game-overlay-close {
+  background: none;
+  border: 1px solid #555;
+  color: #aaa;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.game-overlay-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.game-overlay iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #000;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.site-footer {
+  padding: 3rem 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  margin-top: auto;
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, background 0.2s ease;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: var(--surface-hover);
+  color: var(--accent);
+}
+
+
+.footer-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+/* =========================================================
+   CHAT WIDGET — THE SHOP FOREMAN
+   ========================================================= */
+
+.chat-root {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+  font-family: var(--font-body);
+}
+
+.chat-toggle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px var(--accent-glow);
+  transition: var(--transition);
+  position: relative;
+}
+
+.chat-toggle:hover {
+  transform: scale(1.05);
+}
+
+.chat-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.chat-toggle:hover::after {
+  opacity: 0.4;
+}
+
+.chat-toggle svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.chat-window {
+  position: absolute;
+  bottom: calc(100% + 1rem);
+  right: 0;
+  width: min(360px, calc(100vw - 2rem));
+  height: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.chat-window.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+.chat-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header-title {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.chat-header-sub {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  margin-top: 0.15rem;
+}
+
+.chat-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+}
+
+.chat-close:hover {
+  color: var(--text);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  border-radius: var(--radius);
+}
+
+.chat-bubble.bot {
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  align-self: flex-start;
+  border: 1px solid var(--border);
+}
+
+.chat-bubble.user {
+  background: var(--accent);
+  color: var(--bg);
+  align-self: flex-end;
+}
+
+.chat-input-area {
+  padding: 0.75rem 1.25rem 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.6rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  border-radius: var(--radius);
+  outline: none;
+}
+
+.chat-input:focus {
+  border-color: var(--accent);
+}
+
+.chat-send {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.chat-send:hover {
+  opacity: 0.85;
+}
+
+.chat-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   =========================================================
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+  .system-bar, .chat-root, .scroll-hint, .vibe-btn { display: none; }
+  body { background: #fff; color: #000; }
+}
+</style>
+  <noscript><style>.fade-in { opacity: 1 !important; transform: none !important; }</style></noscript>
+</head>
+<body>
+
+<!-- =======================================================
+     SYSTEM BAR
+     ======================================================= -->
+<header class="system-bar">
+  <div class="system-bar-inner container">
+    <div class="brand-mark">Todd<span> Boswell</span></div>
+    <nav class="nav-links">
+      <a href="#about">About</a>
+      <a href="#rooms">Rooms</a>
+      <a href="#studio">The Work</a>
+      <a href="#workshop">The Bench</a>
+    </nav>
+    <div class="controls">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <button class="vibe-btn" id="vibeBtn" aria-label="Change theme">Vibe</button>
+    </div>
+  </div>
+</header>
+
+<!-- =======================================================
+     HERO — WITH WORKSHOP TABLE BACKGROUND
+     ======================================================= -->
+<section class="hero container" id="top">
+  <div class="hero-split">
+    <div class="hero-text">
+      <div class="hero-tag">Todd Boswell / Omaha, Nebraska</div>
+      <h1>
+        Design leader. Builder. <em>Person who still takes things apart to see how they work.</em>
+      </h1>
+      <p class="hero-lead">
+        Thirty years of in-house design at one of the largest privately held banks in the country.
+        I built the department from the ground up, led the team, shipped the brand systems,
+        and taught design at the college level. That chapter is closed. The work continues.
+      </p>
+      <p class="hero-note">
+        This site is my workshop table. A place to set down experiments, tools, and whatever else catches my attention. Most things here are in progress. That is the fun part.
+      </p>
+      <div class="hero-meta">
+        <span>Fatbaby Design — Independent practice</span>
+        <span>Omaha, Nebraska</span>
+      </div>
+    </div>
+    <div class="hero-portrait">
+      <img id="heroPortrait" src="headshots/headshot-darkroom.jpg" alt="Todd Boswell">
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<!-- =======================================================
+     CRED BAR
+     ======================================================= -->
+<div class="cred-bar">
+  <span>30+ years in-house design leadership</span>
+  <span>Fatbaby Design — Independent practice</span>
+  <span>Flatwater Collective — Volunteer</span>
+  <span>Men of Flatwater — Co-organizer</span>
+</div>
+
+<!-- =======================================================
+     ABOUT
+     ======================================================= -->
+<section class="about container" id="about">
+  <span class="section-label">About</span>
+
+  <p class="lead">I have always been someone who likes to make things.</p>
+
+  <p>
+    When I was a kid, I took apart my Stomper trucks and built little creations out of the motors. That curiosity never really left. It just grew up and got a job. Then it grew up some more and started its own shop.
+  </p>
+
+  <p>
+    For thirty years I led graphic design at <strong>First National Bank of Omaha</strong>. Six business lines. Built the department from scratch. Hired the designers. Shipped the brand systems. Led the team through the 2020 rebrand to FNBO. It was good work. Hard work. The kind that teaches you how to make things inside an institution that moves slow on purpose.
+  </p>
+
+  <p>
+    Now I work for myself under <strong>Fatbaby Design</strong>. Same craft, fewer meetings.
+  </p>
+
+  <p>
+    I also practice with <strong>Flatwater Collective</strong>, an Omaha mindfulness community. I am a sangha member. I show up, I sit, I sometimes guide. Their teachers bring mindfulness into Douglas County and Pottawattamie County jails. I am on the build-and-support side, making digital tools to extend that work. I also started <strong>Men of Flatwater</strong> with Matt Evans — a monthly Saturday-morning circle for men who want to show up and talk.
+  </p>
+
+  <p>
+    After hours, I make a mix of things. Small design experiments. AI tools. Browser games. Woodworking projects. Garden beds. Photography with a Kodak Charmera. Nothing here is perfect. Most of it is in progress. That is the fun part.
+  </p>
+
+  <p class="closing">
+    This site is for the people who know me. Family, friends, anyone who wanders in. If you are here to hire, the work is in the Studio and the Bench. If you are just looking around, take your time. If you are looking for proof that someone can spend three decades inside corporate design and still stay curious, yeah. You found it.
+  </p>
+</section>
+
+<!-- =======================================================
+     ROOMS NAVIGATION
+     ======================================================= -->
+<section class="rooms-nav container" id="rooms">
+  <span class="section-label">Rooms</span>
+  <h2 class="section-title">Seven places to wander</h2>
+
+  <div class="rooms-grid">
+    <a class="room-card" href="#studio">
+      <span class="room-num">01</span>
+      <div class="room-info">
+        <span class="room-name">The Studio</span>
+        <span class="room-desc">Design, brand systems, shipped work, career timeline</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+
+    <a class="room-card" href="#workshop">
+      <span class="room-num">02</span>
+      <div class="room-info">
+        <span class="room-name">The Bench</span>
+        <span class="room-desc">Teaching, AI tools, creative process, the Shop Foreman</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+
+    <a class="room-card" href="#shop">
+      <span class="room-num">03</span>
+      <div class="room-info">
+        <span class="room-name">The Shop</span>
+        <span class="room-desc">Woodworking, carving, making by hand</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+
+    <a class="room-card" href="#garden">
+      <span class="room-num">04</span>
+      <div class="room-info">
+        <span class="room-name">The Garden</span>
+        <span class="room-desc">Growing things, raised beds, Plot Planner</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+
+    <a class="room-card" href="#darkroom">
+      <span class="room-num">05</span>
+      <div class="room-info">
+        <span class="room-name">The Darkroom</span>
+        <span class="room-desc">Photography, Charmera, the quiet Midwest moments</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+
+    <a class="room-card" href="#arcade">
+      <span class="room-num">06</span>
+      <div class="room-info">
+        <span class="room-name">The Arcade</span>
+        <span class="room-desc">Games, experiments, playable things</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+
+    <a class="room-card" href="#quiet">
+      <span class="room-num">07</span>
+      <div class="room-info">
+        <span class="room-name">The Quiet Stuff</span>
+        <span class="room-desc">Flatwater Collective, meditation, Men of Flatwater</span>
+      </div>
+      <span class="room-arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<!-- =======================================================
+     STUDIO — CAREER & WORK
+     ======================================================= -->
+<section class="studio container" id="studio">
+  <span class="section-label">The Studio</span>
+  <h2 class="section-title">Thirty years of making things that last</h2>
+
+  <div class="timeline">
+    <div class="timeline-item fade-in">
+      <div class="timeline-era">1996 — 2005</div>
+      <div class="timeline-title">Building the foundation</div>
+      <div class="timeline-body">
+        <p>Started at First National Bank of Omaha as a designer. Back then the "graphics department" was a room and a printer. I built the systems, hired the people, and shaped the infrastructure that turned it into a functioning creative operation. Learned how to make things inside a bank. That is a specific skill.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-era">2005 — 2020</div>
+      <div class="timeline-title">Scaling the brand</div>
+      <div class="timeline-body">
+        <p>Built the operational infrastructure that holds six business lines together: templates, guidelines, approval workflows, the machinery that lets a small team serve a large institution. Led my graphic designers through the rebrand from First National Bank of Omaha to FNBO in 2020. Taught design at Metropolitan Community College on the side. Different classroom, same lesson: show up, pay attention, share what you know.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-era">2020 — 2026</div>
+      <div class="timeline-title">Leading the team</div>
+      <div class="timeline-body">
+        <p>Senior Manager of Graphic Design. Hired designers, ran the team, fought for craft inside an organization built to move carefully. Thirty years in, I closed that chapter and walked into the next one.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-era">2026 — Present</div>
+      <div class="timeline-title">Independent practice</div>
+      <div class="timeline-body">
+        <p>Fatbaby Design. Consulting, building, teaching. AI tools, training walkthroughs, browser games, a private AI for my family. The soldering iron is back out. The camera is too. Same hands, more room to swing them.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row fade-in">
+    <div class="stat">
+      <div class="stat-num">30+</div>
+      <div class="stat-label">Years in-house</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Business lines</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Brand, rebuilt</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Stomper trucks</div>
+    </div>
+  </div>
+</section>
+
+<!-- =======================================================
+     WORKSHOP — TOOLS & PROCESS
+     ======================================================= -->
+<section class="workshop container" id="workshop">
+  <span class="section-label">The Bench</span>
+  <h2 class="section-title">Tools, teaching, and the Shop Foreman</h2>
+
+  <p style="color: var(--text-muted); max-width: 600px; line-height: 1.75; margin-bottom: 2rem;">
+    I teach creative teams how to use AI as a real tool, not a parlor trick. I build the tools I wish existed. The Shop Foreman (bottom right) knows where everything is stored. Ask it about a room, a project, or why I still use a cheap Kodak camera.
+  </p>
+
+  <div class="tools-grid">
+    <div class="tool-card fade-in">
+      <div class="tool-name">Atlas</div>
+      <div class="tool-desc">Personal project management dashboard. Tracks what I am working on across Work, Freelance, and Personal lanes with AI-powered reflection, workload forecasting, and project dossiers.</div>
+      <a class="tool-link cartridge" href="Junkdrawer/atlas-demo.html" data-game data-title="Atlas">Try the Demo →</a>
+    </div>
+
+    <div class="tool-card fade-in">
+      <div class="tool-name">Fatbaby Walkthrough Builder</div>
+      <div class="tool-desc">White-label training walkthrough platform. Self-contained HTML walkthroughs with animated hotspots. No subscription. Client owns the file forever.</div>
+      <span class="tool-note">Part 2</span>
+    </div>
+
+    <div class="tool-card fade-in">
+      <div class="tool-name">Plot Planner</div>
+      <div class="tool-desc">Garden planning app. Polygon bed drawing, biointensive spacing, companion planting warnings. 29 plant varieties and counting.</div>
+      <span class="tool-note">Part 2</span>
+    </div>
+
+    <div class="tool-card fade-in">
+      <div class="tool-name">Flipper Zero Dashboard</div>
+      <div class="tool-desc">Web Serial intelligence dashboard for the Flipper Zero. Real-time packet parsing, signal family classification, phosphor CRT aesthetic.</div>
+      <span class="tool-note">Part 2</span>
+    </div>
+  </div>
+</section>
+
+<!-- =======================================================
+     THE SHOP
+     ======================================================= -->
+<section class="content-section container" id="shop">
+  <span class="section-label">The Shop</span>
+  <h2 class="section-title">Things made with hands and sharp tools</h2>
+
+  <p>
+    Woodworking, carving, sculpting. End-grain cutting boards. Spoons. Bowls. Whatever the wood wants to be. Process shots and finished pieces.
+  </p>
+
+  <span class="part-2-note">Part 2 — Gallery coming soon</span>
+</section>
+
+<!-- =======================================================
+     THE GARDEN
+     ======================================================= -->
+<section class="content-section container" id="garden">
+  <span class="section-label">The Garden</span>
+  <h2 class="section-title">What is growing</h2>
+
+  <p>
+    Raised beds. Dahlias. Tomatoes. Too many tomato varieties. The Plot Planner lives here. 29 plant varieties, biointensive spacing, companion planting warnings.
+  </p>
+
+  <span class="part-2-note">Part 2 — Plot Planner coming soon</span>
+</section>
+
+<!-- =======================================================
+     THE DARKROOM — WITH LIVE IMAGE FEED
+     ======================================================= -->
+<section class="content-section container" id="darkroom">
+  <span class="section-label">The Darkroom</span>
+  <h2 class="section-title">The quiet stuff I see when nobody else is looking</h2>
+
+  <p>
+    Shot on a Kodak Charmera. The camera is cheap. The light does whatever it wants. Hallways, parking lots, family moments, things that catch my eye. The Midwest thinks nobody is watching. I am.
+  </p>
+
+  <a class="action-link" href="Charmera/" id="charmeraGalleryLink">
+    View Full Charmera Gallery →
+  </a>
+
+  <div class="darkroom-feed">
+    <div class="feed-grid" id="charmeraFeed">
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+      <div class="feed-cell"><img data-src="placeholder" alt="Charmera photo" loading="lazy"></div>
+    </div>
+    <div class="feed-meta" id="feedMeta">Discovering images...</div>
+  </div>
+</section>
+
+<!-- =======================================================
+     THE ARCADE
+     ======================================================= -->
+<section class="content-section container" id="arcade">
+  <span class="section-label">The Arcade</span>
+  <h2 class="section-title">Stuff you can play with</h2>
+
+  <p>
+    Browser games. All single-file HTML. All CRT aesthetic. All free. Insert coin to continue.
+  </p>
+
+  <div class="cartridge-deck">
+    <a class="cartridge" href="Junkdrawer/spaced-invaders.html" data-game>
+      <svg class="cartridge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2zm0 3h2v6h-2zm0 3h2v2h-2z" fill="none"/><path d="M12 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/><rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="2" height="2"/><rect x="9" y="13" width="2" height="2"/><rect x="13" y="13" width="2" height="2"/><rect x="11" y="11" width="2" height="2"/><path d="M7 7h2v2H7zm8 0h2v2h-2zm0 8h2v2h-2zm-8 0h2v2H7z"/></svg>
+      Spaced Invaders
+    </a>
+    <a class="cartridge" href="Junkdrawer/fullstackTBOS.html" data-game>
+      <svg class="cartridge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="2" width="4" height="4"/><rect x="9" y="2" width="4" height="4"/><rect x="9" y="6" width="4" height="4"/><rect x="13" y="6" width="4" height="4"/><rect x="7" y="14" width="4" height="4"/><rect x="11" y="14" width="4" height="4"/><rect x="11" y="18" width="4" height="4"/><rect x="15" y="14" width="4" height="4"/></svg>
+      Full Stack Tetris
+    </a>
+    <a class="cartridge" href="Junkdrawer/toader.html" data-game>
+      <svg class="cartridge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="12" cy="16" rx="7" ry="4"/><circle cx="9" cy="14" r="1.5"/><circle cx="15" cy="14" r="1.5"/><path d="M12 12v-2" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="10" y="6" width="4" height="4" rx="1"/><path d="M8 8H6v4h2zm8 0h2v4h-2z"/></svg>
+      Toader
+    </a>
+    <a class="cartridge" href="Junkdrawer/toddio.html" data-game>
+      <svg class="cartridge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="8" width="12" height="8" rx="2"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><path d="M12 14v2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 10h2v4H4zm14 0h2v4h-2z"/><path d="M8 6h8v2H8z"/></svg>
+      Toddio
+    </a>
+    <a class="cartridge" href="Junkdrawer/conan-game.html" data-game>
+      <svg class="cartridge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="4" width="8" height="12" rx="4"/><path d="M12 16v4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 20h8v2H8z"/><circle cx="10" cy="9" r="1"/><circle cx="14" cy="9" r="1"/><path d="M10 12h4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+      Is It Conan?!
+    </a>
+    <a class="cartridge" href="Junkdrawer/make-it-pop.html" data-game>
+      <svg class="cartridge-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.5 5.5L20 9l-4 4.5L17 19l-5-3-5 3 1-5.5L4 9l5.5-1.5z"/></svg>
+      Make It Pop!
+    </a>
+  </div>
+</section>
+
+<!-- =======================================================
+     THE QUIET STUFF
+     ======================================================= -->
+<section class="content-section container" id="quiet">
+  <span class="section-label">The Quiet Stuff</span>
+  <h2 class="section-title">The work that matters most</h2>
+
+  <p>
+    Flatwater Collective. Helping get digital resources into the facilities they serve. I do not go inside. I am on the build-and-support side. Show up. Build what is needed. Share what you know.
+  </p>
+
+  <p>
+    Also helping start a men's group called Men of Flatwater. Monthly. First Saturday of the month, 8 AM. 1219 Leavenworth, Omaha. Rooted in the same practice.
+  </p>
+
+  <a class="action-link" href="https://flatwatercollective.org" target="_blank" rel="noopener">
+    Visit Flatwater Collective →
+  </a>
+</section>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">&uarr;</button>
+
+<!-- =======================================================
+     FOOTER
+     ======================================================= -->
+<footer class="site-footer">
+  <div class="footer-meta">Todd Boswell — Fatbaby Design — Omaha, Nebraska</div>
+  <div class="footer-links">
+    <a href="https://linkedin.com/in/toddboswell" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:todd@toddboswell.com">Email</a>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<!-- =======================================================
+     CHAT WIDGET — THE SHOP FOREMAN
+     ======================================================= -->
+<div class="chat-root" id="chatRoot">
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div>
+        <div class="chat-header-title">The Shop Foreman</div>
+        <div class="chat-header-sub">Knows where everything is stored</div>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-bubble bot">Yeah. I know where the rooms are. What do you need?</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Ask about a room or project..." autocomplete="off">
+      <button class="chat-send" id="chatSend">Send</button>
+    </div>
+  </div>
+  <button class="chat-toggle" id="chatToggle" aria-label="Open chat">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/><path d="M7 9h10v2H7zm0-3h10v2H7z"/></svg>
+  </button>
+</div>
+
+<!-- =======================================================
+     JAVASCRIPT
+     ======================================================= -->
+<!-- Game Overlay -->
+<div class="game-overlay" id="gameOverlay">
+  <div class="game-overlay-bar">
+    <span id="gameOverlayTitle">Loading...</span>
+    <button class="game-overlay-close" id="gameOverlayClose">ESC &middot; Back to Site</button>
+  </div>
+  <iframe id="gameOverlayFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+</div>
+
+  <script src="charmera-manifest.js"></script>
+  <script>
+(function() {
+  'use strict';
+
+  // ===== VIBE / THEME SYSTEM =====
+  const vibes = ['darkroom', 'midwest', 'brutalist', 'retrowave'];
+  const VIBE_HEX = {
+    'darkroom': '#0a0a0a',
+    'midwest': '#f5f2ed',
+    'brutalist': '#ffffff',
+    'retrowave': '#0f0518'
+  };
+  const VIBE_HEADSHOT = {
+    'darkroom': 'headshots/headshot-darkroom.jpg',
+    'midwest': 'headshots/headshot-midwest.jpg',
+    'brutalist': 'headshots/headshot-brutalist.jpeg',
+    'retrowave': 'headshots/headshot-pinkout.jpg'
+  };
+  let currentVibe = localStorage.getItem('todd-vibe') || 'darkroom';
+  document.body.setAttribute('data-vibe', currentVibe);
+  syncThemeColor();
+  syncHeroPortrait(false);
+
+  // ===== MOBILE MENU =====
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.querySelector('.nav-links');
+
+  menuBtn.addEventListener('click', () => {
+    const open = menuBtn.getAttribute('aria-expanded') === 'true';
+    menuBtn.setAttribute('aria-expanded', !open);
+    menuBtn.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
+    navLinks.classList.toggle('mobile-open', !open);
+  });
+
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', 'Open menu');
+      navLinks.classList.remove('mobile-open');
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navLinks.classList.contains('mobile-open')) {
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', 'Open menu');
+      navLinks.classList.remove('mobile-open');
+    }
+  });
+
+  // ===== BACK TO TOP =====
+  const backToTop = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    backToTop.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.getElementById('vibeBtn').addEventListener('click', () => {
+    const idx = vibes.indexOf(currentVibe);
+    currentVibe = vibes[(idx + 1) % vibes.length];
+    document.body.setAttribute('data-vibe', currentVibe);
+    localStorage.setItem('todd-vibe', currentVibe);
+    syncThemeColor();
+    syncHeroPortrait(true);
+  });
+
+  function syncThemeColor() {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', VIBE_HEX[currentVibe] || VIBE_HEX['darkroom']);
+  }
+
+  function syncHeroPortrait(animate) {
+    const img = document.getElementById('heroPortrait');
+    if (!img) return;
+    const src = VIBE_HEADSHOT[currentVibe] || VIBE_HEADSHOT['darkroom'];
+    if (!animate) { img.src = src; return; }
+    img.classList.add('fading');
+    setTimeout(() => { img.src = src; img.onload = () => img.classList.remove('fading'); }, 400);
+  }
+
+  // ===== SCROLL ANIMATIONS =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // ===== CHAT WIDGET =====
+  const chatToggle = document.getElementById('chatToggle');
+  const chatWindow = document.getElementById('chatWindow');
+  const chatClose = document.getElementById('chatClose');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+  const chatMessages = document.getElementById('chatMessages');
+  let isOpen = false;
+
+  function toggleChat() {
+    isOpen = !isOpen;
+    chatWindow.classList.toggle('open', isOpen);
+    if (isOpen) setTimeout(() => chatInput.focus(), 100);
+  }
+
+  chatToggle.addEventListener('click', toggleChat);
+  chatClose.addEventListener('click', toggleChat);
+
+  function addMessage(text, sender) {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + sender;
+    bubble.textContent = text;
+    chatMessages.appendChild(bubble);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  const knowledgeBase = [
+    {
+      keywords: ['studio', 'career', 'work', 'fnbo', 'bank', 'job', 'title', 'designer', 'manager'],
+      response: "Todd spent thirty years leading in-house graphic design at FNBO in Omaha. Six business lines. He built the department from the ground up and led the team through the rebrand from First National Bank of Omaha to FNBO in 2020. Templates, guidelines, approval workflows — the machinery that lets a small team serve a large institution. That chapter closed in 2026. He works for himself now under Fatbaby Design."
+    },
+    {
+      keywords: ['workshop', 'tool', 'ai', 'atlas', 'walkthrough', 'plot planner', 'flipper', 'dashboard'],
+      response: "The Workshop is where Todd builds tools. He makes training walkthroughs, garden planners, dashboards, and whatever else scratches the itch. Most of them are built with plain HTML, JS, and a stubborn refusal to use a framework. He also teaches creative teams how to use AI as a real tool, not a parlor trick."
+    },
+    {
+      keywords: ['shop', 'wood', 'carving', 'spoon', 'bowl', 'cutting board', 'sculpt'],
+      response: "The Shop is woodworking. End-grain cutting boards. Spoons. Bowls. Whatever the wood wants to be. Sharp tools and quiet. Part 2 gallery coming soon."
+    },
+    {
+      keywords: ['garden', 'plant', 'tomato', 'dahlia', 'raised bed', 'plot planner', 'growing'],
+      response: "The Garden has raised beds, dahlias, and too many tomato varieties. Plot Planner lives here — 29 plant varieties, biointensive spacing, companion planting warnings. Part 2 coming soon."
+    },
+    {
+      keywords: ['darkroom', 'photo', 'camera', 'charmera', 'night', 'midwest', 'kodak', 'photography'],
+      response: "The Darkroom is photography with a Kodak Charmera. Hallways, parking lots, family moments, whatever catches his eye. The camera is cheap. The light does whatever it wants. The Midwest thinks nobody is watching. Todd is. View the gallery at Charmera/."
+    },
+    {
+      keywords: ['arcade', 'game', 'spaced invaders', 'tetris', 'toader', 'toddio', 'conan', 'make it pop'],
+      response: "The Arcade has six browser games. All single-file HTML. All CRT aesthetic. All free. Spaced Invaders, Full Stack Tetris, Toader, Toddio, Is It Conan?!, and Make It Pop!. Insert coin to continue."
+    },
+    {
+      keywords: ['quiet', 'flatwater', 'meditation', 'mens group', 'jail', 'correctional', 'volunteer', 'matt evans', 'sangha', 'mindfulness'],
+      response: "The Quiet Stuff is Flatwater Collective, an Omaha mindfulness community. Todd is a sangha member. He shows up, sits, and sometimes guides. Their teachers bring mindfulness into Douglas County and Pottawattamie County jails. Todd is building digital tools to support that work. He also started Men of Flatwater with Matt Evans — a monthly Saturday-morning circle for men. First Saturday of the month, 8 AM, 1219 Leavenworth."
+    },
+    {
+      keywords: ['about', 'who', 'todd', 'boswell', 'person', 'background', 'story'],
+      response: "Todd Boswell. Thirty years building graphic design at FNBO from scratch. That chapter closed in 2026. Now working independently under Fatbaby Design. Omaha, Nebraska. Took apart Stomper trucks as a kid and never stopped. Makes things from wood, pixels, photographs, gardens, and code."
+    },
+    {
+      keywords: ['stomper', 'truck', 'kid', 'childhood', 'motor', 'battery', 'solder'],
+      response: "As a kid, Todd took apart Stomper trucks and built little creations from the motors. In 8th grade he found a Mac that let you flip pixels from white to black and sat there all day. The tools have changed a dozen times since then. The instinct has not."
+    },
+    {
+      keywords: ['family', 'wife', 'sons', 'kids', 'grandson', 'mimi', 'zane', 'eli', 'baker'],
+      response: "Family stays mostly private. The short version: married to Mimi, two grown sons, and a new grandson named Baker. They are the reason any of this matters."
+    },
+    {
+      keywords: ['teach', 'teacher', 'adjunct', 'college', 'metropolitan', 'mcc', 'instruction'],
+      response: "Todd used to teach design at Metropolitan Community College. Now he teaches creative teams how to use AI as a real tool, not a parlor trick. Same approach either way: show up, pay attention, share what you know."
+    },
+    {
+      keywords: ['voice', 'style', 'write', 'tone', 'wieden', 'kennedy', 'copy', 'language'],
+      response: "Todd's voice is dry, declarative, Midwestern. No em dashes. No marketing language. Short sentences. Wieden+Kennedy edge with Nebraska understatement. He says things like 'It just grew up and got a job' and 'Thirty years of taste is the differentiator. Everything else I can learn by Tuesday.'"
+    },
+    {
+      keywords: ['film', 'movie', 'ai video', 'video', 'making a film'],
+      response: "Todd is making a film, mostly to learn how AI fits into that kind of work before he needs to know."
+    },
+    {
+      keywords: ['private ai', 'family ai', 'home ai', 'pc ai', 'local ai'],
+      response: "Todd runs a private AI for his family on a PC in their house. Not cloud-based. Local. His own infrastructure."
+    },
+    {
+      keywords: ['solder', 'soldering', 'iron', 'electronics', 'circuit', 'hardware'],
+      response: "The soldering iron is back out. Todd builds physical things too — electronics, circuits, hardware experiments. Same process as everything else: take it apart, see how it works, build something better."
+    },
+    {
+      keywords: ['omaha', 'nebraska', 'midwest', 'where', 'location', 'live'],
+      response: "Todd lives in Omaha, Nebraska. Has for decades. The Midwest is his subject and his material."
+    },
+    {
+      keywords: ['linkedin', 'contact', 'email', 'reach', 'message', 'connect'],
+      response: "LinkedIn is linked in the footer. Email is todd@toddboswell.com. He reads both."
+    },
+    {
+      keywords: ['hello', 'hi', 'hey', 'howdy', 'sup'],
+      response: "Yeah. Hey. What do you need?"
+    },
+    {
+      keywords: ['fatbaby', 'design', 'freelance', 'side work', 'client', 'hire', 'work with'],
+      response: "Fatbaby Design is Todd's independent practice. Print, digital, training walkthroughs, AI tools for creative teams. $5K to $15K one-time builds. No subscriptions. Client owns the file forever."
+    },
+    {
+      keywords: ['mr todd', 'workshop', 'maker', 'carving', 'spoons', 'instagram', 'wood', 'craft', 'etsy'],
+      response: "Mr Todd's Workshop is the maker side — physical objects made by hand. Wood, carving, smaller things. Process is on Instagram at @mrtoddsworkshop. The shop is still being built. Quiet for now."
+    },
+    {
+      keywords: ['vibe', 'theme', 'darkroom', 'midwest', 'brutalist', 'retrowave', 'color'],
+      response: "The site has four vibes. Darkroom is default — black and gold. Midwest is warm paper and brown. Brutalist is white, black, and red. Retrowave is purple and neon pink. Click 'Vibe' in the top bar to cycle."
+    }
+  ];
+
+  function getLocalReply(text) {
+    const lower = text.toLowerCase();
+    for (const entry of knowledgeBase) {
+      if (entry.keywords.some(kw => lower.includes(kw))) {
+        return entry.response;
+      }
+    }
+    if (lower.includes('?')) {
+      return "Yeah. I hear you. Try asking about a specific room, a project, or what Todd does at FNBO. I know more than I let on.";
+    }
+    if (lower.length < 5) {
+      return "Need a little more to go on. Ask me about the Studio, the Workshop, the Darkroom, or why Todd still uses a camera from 1987.";
+    }
+    return "Yeah. I am not sure what you mean. Try asking about a room, a tool, what Todd does for work, or how he got started taking things apart.";
+  }
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    addMessage(text, 'user');
+    chatInput.value = '';
+    chatSend.disabled = true;
+
+    setTimeout(() => {
+      addMessage(getLocalReply(text), 'bot');
+      chatSend.disabled = false;
+      chatInput.focus();
+    }, 600);
+  }
+
+  chatSend.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  // ===== GAME OVERLAY =====
+  const gameOverlay = document.getElementById('gameOverlay');
+  const gameFrame = document.getElementById('gameOverlayFrame');
+  const gameTitle = document.getElementById('gameOverlayTitle');
+
+  function openGame(href, title) {
+    gameTitle.textContent = title;
+    gameFrame.src = href;
+    gameOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.querySelector('.site-footer').style.display = 'none';
+  }
+
+  function closeGame() {
+    gameOverlay.classList.remove('open');
+    gameFrame.src = '';
+    document.body.style.overflow = '';
+    document.querySelector('.site-footer').style.display = '';
+  }
+
+  document.getElementById('gameOverlayClose').addEventListener('click', closeGame);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && gameOverlay.classList.contains('open')) closeGame();
+  });
+
+  document.querySelectorAll('.cartridge[data-game]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      openGame(link.getAttribute('href'), link.dataset.title || link.textContent.trim());
+    });
+  });
+
+  document.getElementById('charmeraGalleryLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    openGame('Charmera/', 'Charmera Gallery');
+  });
+
+  // ===== SMOOTH SCROLL =====
+  document.querySelectorAll('.nav-links a[href^="#"], .room-card[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const headerOffset = 60;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // ===== CHARMERA LIVE IMAGE FEED =====
+  // Uses charmera-manifest.js for reliable image list
+  const FEED_CELLS = 8;
+  const SWAP_INTERVAL = 6000;
+  const MAX_RETRIES = 3;
+
+  function initCharmeraFeed() {
+    var meta = document.getElementById('feedMeta');
+    var grid = document.getElementById('charmeraFeed');
+    if (!meta || !grid) return;
+
+    // Build image pool from manifest
+    var pool = [];
+    if (window.CHARMERA_MANIFEST && window.CHARMERA_MANIFEST.photos) {
+      var m = window.CHARMERA_MANIFEST;
+      pool = m.photos.map(function(p) { return m.basePath + p + m.extension; });
+    }
+
+    if (pool.length === 0) {
+      grid.style.display = 'none';
+      meta.textContent = 'No Charmera images found.';
+      return;
+    }
+
+    meta.textContent = 'Loading...';
+
+    var cells = grid.querySelectorAll('.feed-cell img');
+    var activeImages = [];
+    var loadedCount = 0;
+
+    function pickRandom() {
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function removeFromPool(url) {
+      var idx = pool.indexOf(url);
+      if (idx !== -1) pool.splice(idx, 1);
+    }
+
+    function assignImage(img, retriesLeft) {
+      if (pool.length === 0) { img.style.opacity = '0.3'; return; }
+      var src = pickRandom();
+      img.removeAttribute('loading');
+      img.removeAttribute('data-src');
+      img.src = src;
+      img.alt = 'Charmera photo';
+      img.onload = function() {
+        img.classList.add('loaded');
+        loadedCount++;
+        meta.textContent = 'Loading...';
+        if (loadedCount === Math.min(FEED_CELLS, cells.length)) {
+          meta.textContent = 'Moments from the day — always shuffling';
+        }
+      };
+      img.onerror = function() {
+        removeFromPool(src);
+        if (retriesLeft > 0 && pool.length > 0) {
+          assignImage(img, retriesLeft - 1);
+        } else if (pool.length > 0) {
+          assignImage(img, 0);
+        } else {
+          img.style.opacity = '0.3';
+        }
+      };
+    }
+
+    cells.forEach(function(img) {
+      assignImage(img, MAX_RETRIES);
+      activeImages.push(img);
+    });
+
+    setInterval(function() {
+      if (activeImages.length === 0 || pool.length === 0) return;
+      var idx = Math.floor(Math.random() * activeImages.length);
+      var img = activeImages[idx];
+      var newSrc = pickRandom();
+      if (newSrc && newSrc !== img.src) {
+        img.classList.remove('loaded');
+        img.classList.add('swapping');
+        setTimeout(function() {
+          img.src = newSrc;
+          img.onload = function() {
+            img.classList.remove('swapping');
+            img.classList.add('loaded');
+          };
+          img.onerror = function() {
+            removeFromPool(newSrc);
+            img.classList.remove('swapping');
+          };
+        }, 1200);
+      }
+    }, SWAP_INTERVAL);
+  }
+
+  var darkroomSection = document.getElementById('darkroom');
+  if (darkroomSection) {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          initCharmeraFeed();
+          obs.disconnect();
+        }
+      });
+    }, { threshold: 0.05 });
+    obs.observe(darkroomSection);
+  };
+
+})();
+</script>
+
+</body>
+</html>
